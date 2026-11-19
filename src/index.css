@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+  --color-crema: #fbf7f1;
+  --color-arena: #e8dfd3;
+  --color-terracota: #c2643c;
+  --color-terracota-oscuro: #a4502d;
+  --color-cafe: #2b211b;
+  --color-cafe-suave: #6b5a4e;
+}
+
+@layer base {
+  body {
+    @apply bg-crema font-sans text-cafe antialiased;
+  }
+}
