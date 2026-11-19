@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/useAuth.js'
 import Logo from './Logo.jsx'
 
 export default function Navbar() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const { usuario, cerrarSesion } = useAuth()
   const [conFondo, setConFondo] = useState(false)
   const [oculto, setOculto] = useState(false)
   const [menuAbiertoEn, setMenuAbiertoEn] = useState(null)
@@ -24,6 +27,18 @@ export default function Navbar() {
 
   const transparente = pathname === '/' && !conFondo && !menuAbierto
 
+  const enlace = transparente ? 'text-crema hover:text-white' : 'text-cafe-suave hover:text-cafe'
+  const botonSecundario = `rounded-full border font-medium transition-colors ${
+    transparente
+      ? 'border-crema/50 text-crema hover:bg-crema/10'
+      : 'border-cafe/20 text-cafe hover:border-cafe/40 hover:bg-arena/40'
+  }`
+
+  const salir = () => {
+    cerrarSesion()
+    navigate('/')
+  }
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
@@ -39,20 +54,28 @@ export default function Navbar() {
 
         <div className="justify-self-end">
           <div className="hidden items-center gap-6 md:flex">
-            <Link
-              to="/login"
-              className={`font-medium transition-colors ${
-                transparente ? 'text-crema hover:text-white' : 'text-cafe-suave hover:text-cafe'
-              }`}
-            >
-              Iniciar sesión
-            </Link>
-            <Link
-              to="/register"
-              className="rounded-full bg-terracota px-5 py-2 font-medium text-crema transition-colors hover:bg-terracota-oscuro"
-            >
-              Registrarse
-            </Link>
+            {usuario ? (
+              <>
+                <Link to="/panel" className={`font-medium transition-colors ${enlace}`}>
+                  Hola, {usuario.nombre}
+                </Link>
+                <button type="button" onClick={salir} className={`${botonSecundario} px-5 py-2`}>
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className={`font-medium transition-colors ${enlace}`}>
+                  Iniciar sesión
+                </Link>
+                <Link
+                  to="/register"
+                  className="rounded-full bg-terracota px-5 py-2 font-medium text-crema transition-colors hover:bg-terracota-oscuro"
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -74,15 +97,32 @@ export default function Navbar() {
 
       {menuAbierto && (
         <div id="menu-movil" className="border-t border-arena px-4 pb-4 md:hidden">
-          <Link to="/login" className="block py-3 font-medium text-cafe">
-            Iniciar sesión
-          </Link>
-          <Link
-            to="/register"
-            className="block rounded-full bg-terracota py-3 text-center font-medium text-crema"
-          >
-            Registrarse
-          </Link>
+          {usuario ? (
+            <>
+              <Link to="/panel" className="block py-3 font-medium text-cafe">
+                Hola, {usuario.nombre}
+              </Link>
+              <button
+                type="button"
+                onClick={salir}
+                className="block w-full rounded-full border border-cafe/20 py-3 text-center font-medium text-cafe"
+              >
+                Cerrar sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="block py-3 font-medium text-cafe">
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/register"
+                className="block rounded-full bg-terracota py-3 text-center font-medium text-crema"
+              >
+                Registrarse
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
