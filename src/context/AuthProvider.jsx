@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContext } from './AuthContext.js'
-import { login } from '../api/usuarios.js'
+import { login, registro, usuarioActual } from '../api/usuarios.js'
 
 const CLAVE = 'suppli-sesion'
 
@@ -45,26 +45,64 @@ export default function AuthProvider({ children }) {
     return user
   }, [])
 
+  const registrarse = useCallback(
+    async (datos) => {
+      await registro(datos)
+      return iniciarSesion(datos.correo, datos.contraseña)
+    },
+    [iniciarSesion],
+  )
+
   const cerrarSesion = useCallback(() => {
     guardarSesion(null)
     setSesion(null)
   }, [])
 
+  const token = sesion?.token
+
   useEffect(() => {
-    if (!sesion) return
-    const restante = caducidad(sesion.token) - Date.now()
+    if (!token) return
+    const restante = caducidad(token) - Date.now()
     const temporizador = setTimeout(cerrarSesion, Math.max(restante, 0))
     return () => clearTimeout(temporizador)
-  }, [sesion, cerrarSesion])
+  }, [token, cerrarSesion])
+
+  useEffect(() => {
+    if (!token) return
+    let cancelado = false
+
+    const refrescar = async () => {
+      try {
+        const usuario = await usuarioActual(token)
+        if (cancelado) return
+        setSesion((actual) => {
+          if (actual?.token !== token) return actual
+          const nueva = { ...actual, usuario }
+          guardarSesion(nueva)
+          return nueva
+        })
+      } catch (error) {
+        if (!cancelado && error.estado === 401) cerrarSesion()
+      }
+    }
+
+    refrescar()
+    window.addEventListener('focus', refrescar)
+    return () => {
+      cancelado = true
+      window.removeEventListener('focus', refrescar)
+    }
+  }, [token, cerrarSesion])
 
   const valor = useMemo(
     () => ({
       usuario: sesion?.usuario ?? null,
       token: sesion?.token ?? null,
       iniciarSesion,
+      registrarse,
       cerrarSesion,
     }),
-    [sesion, iniciarSesion, cerrarSesion],
+    [sesion, iniciarSesion, registrarse, cerrarSesion],
   )
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>
