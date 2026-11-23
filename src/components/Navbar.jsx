@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import Logo from './Logo.jsx'
 
@@ -28,6 +28,7 @@ export default function Navbar() {
   const transparente = pathname === '/' && !conFondo && !menuAbierto
 
   const enlace = transparente ? 'text-crema hover:text-white' : 'text-cafe-suave hover:text-cafe'
+  const activo = transparente ? 'text-white' : 'text-terracota'
   const botonSecundario = `rounded-full border font-medium transition-colors ${
     transparente
       ? 'border-crema/50 text-crema hover:bg-crema/10'
@@ -46,7 +47,19 @@ export default function Navbar() {
       } ${transparente ? 'bg-transparent' : 'bg-crema/95 shadow-sm backdrop-blur'}`}
     >
       <nav className="mx-auto grid h-16 max-w-6xl grid-cols-3 items-center px-4 md:h-20">
-        <div />
+        <div className="hidden items-center gap-6 md:flex">
+          {usuario && (
+            <>
+              <NavLink to="/panel" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
+                Panel
+              </NavLink>
+              <NavLink to="/catalogo" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
+                Catálogo
+              </NavLink>
+            </>
+          )}
+        </div>
+        <div className="md:hidden" />
 
         <Link to="/" className="justify-self-center" aria-label="Suppli, ir al inicio">
           <Logo claro={transparente} />
@@ -101,6 +114,9 @@ export default function Navbar() {
             <>
               <Link to="/panel" className="block py-3 font-medium text-cafe">
                 Hola, {usuario.nombre}
+              </Link>
+              <Link to="/catalogo" className="mb-2 block py-3 font-medium text-cafe">
+                Catálogo
               </Link>
               <button
                 type="button"

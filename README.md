@@ -157,7 +157,9 @@ La lista completa está en el README del backend.
 | `/quienes-somos` | Público | Origen del proyecto, el problema que resuelve, la solución y quién está detrás |
 | `/login` | Público | Inicio de sesión. Si ya hay sesión, redirige a `/panel` |
 | `/register` | Público | Registro de una cuenta nueva. Al terminar, inicia sesión automáticamente |
-| `/panel` | Con sesión | Página de bienvenida con el nombre y el rol del usuario. Aquí irán el catálogo y los pedidos |
+| `/panel` | Con sesión | Página de bienvenida con el nombre y el rol del usuario. Si es un empleado sin local, muestra un aviso para que pida al encargado que lo añada; si tiene locales, los muestra con su foto y su logo. Incluye un acceso directo al catálogo |
+| `/catalogo` | Con sesión | Vista general de todos los proveedores: contacto, días de reparto, número de productos y categorías. Tiene un buscador que encuentra proveedores y también productos (indicando a qué proveedor se piden) |
+| `/catalogo/:proveedorId` | Con sesión | Productos de un proveedor, con buscador y filtro por categoría. Cada producto muestra su precio, proveedor y categoría, un icono de información que, al pasar el ratón, enseña el stock óptimo de invierno y verano y los días de reparto, y un selector de cantidad en su medida (lata, kg, barril…) |
 
 ### Diseño
 
@@ -179,6 +181,12 @@ La lista completa está en el README del backend.
 - Con la sesión iniciada, el menú muestra el nombre del usuario y el botón **Cerrar sesión**.
 
 > **Sobre el registro:** todo el que se registra entra como `empleado` y sin bar asignado. Puede iniciar sesión, pero no puede hacer pedidos hasta que el encargado de un bar lo añada a su local. Es una decisión de seguridad: así nadie de fuera puede hacer pedidos en nombre de un local.
+
+### Pedidos: un proveedor cada vez
+
+Cada pedido va a **un solo proveedor**, igual que en la API. En el catálogo, el empleado va marcando cantidades y abajo aparece una barra con el pedido en curso: el proveedor, el número de productos y el total. Si intenta añadir un producto de otro proveedor, la app le avisa y le deja elegir entre seguir con el pedido actual o vaciarlo y empezar uno nuevo. El pedido en curso se guarda en `localStorage` para cada usuario, así que no se pierde al recargar.
+
+Solo los **empleados con un local asignado** pueden preparar pedidos. Los demás usuarios pueden consultar el catálogo.
 
 ### Validaciones de los formularios
 
@@ -204,9 +212,10 @@ Los errores que devuelve la API, como "Usuario o contraseña incorrectos" o "El 
 - [x] Página "Quiénes somos"
 - [x] Login y registro con validaciones
 - [x] Sesión con JWT, rutas protegidas y refresco de los datos del usuario
-- [ ] Aviso en el panel para los empleados que aún no tienen bar asignado
-- [ ] **Catálogo** visual de productos, con búsqueda por nombre, categoría y proveedor
-- [ ] **Carrito** para ir sumando productos a un pedido
+- [x] Aviso en el panel para los empleados que aún no tienen bar asignado, y lista de sus locales para los que sí lo tienen
+- [x] **Catálogo** visual de productos, con búsqueda por nombre, categoría y proveedor
+- [x] **Pedido en curso** para ir sumando productos, siempre de un solo proveedor, que se mantiene al recargar la página
+- [ ] Pantalla para **revisar el pedido** y elegir el local antes de enviarlo
 - [ ] Envío del pedido al proveedor por **WhatsApp**, con el mensaje ya formateado
 - [ ] **Historial de pedidos** y cambio de estado (`pendiente` → `enviado` → `entregado`)
 - [ ] Panel del **encargado**: gestión de bares y empleados

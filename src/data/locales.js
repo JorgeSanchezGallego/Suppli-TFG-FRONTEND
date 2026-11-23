@@ -54,4 +54,17 @@ const locales = [
   },
 ]
 
+const normalizar = (texto) =>
+  texto
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim()
+
+export function buscarLocal(nombre) {
+  if (!nombre) return null
+  const buscado = normalizar(nombre)
+  return locales.find((local) => normalizar(local.nombre) === buscado) ?? null
+}
+
 export default locales

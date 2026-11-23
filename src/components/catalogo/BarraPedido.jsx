@@ -1,0 +1,44 @@
+import { Link } from 'react-router-dom'
+import { usePedido } from '../../context/usePedido.js'
+import { euros } from '../../utils/formato.js'
+
+export default function BarraPedido() {
+  const { proveedor, numProductos, total, vaciar } = usePedido()
+
+  if (numProductos === 0) return null
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-3xl bg-cafe p-4 text-crema shadow-[0_24px_60px_-10px_rgb(43_33_27/0.6)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div>
+          <p className="text-xs font-medium tracking-[0.2em] text-crema/70 uppercase">
+            Pedido a{' '}
+            <Link to={`/catalogo/${proveedor?._id}`} className="underline decoration-crema/40 underline-offset-4 hover:text-crema">
+              {proveedor?.nombre_empresa}
+            </Link>
+          </p>
+          <p className="mt-0.5 text-lg font-semibold">
+            {numProductos} {numProductos === 1 ? 'producto' : 'productos'} · {euros(total)}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={vaciar}
+            className="flex-1 rounded-full border border-crema/30 px-5 py-2.5 font-medium transition hover:bg-crema/10 sm:flex-none"
+          >
+            Vaciar
+          </button>
+          <button
+            type="button"
+            disabled
+            title="El envío por WhatsApp llega en el siguiente paso"
+            className="flex-1 rounded-full bg-terracota px-5 py-2.5 font-medium opacity-60 sm:flex-none"
+          >
+            Revisar pedido
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
