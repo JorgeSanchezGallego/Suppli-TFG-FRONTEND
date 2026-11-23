@@ -76,7 +76,7 @@ export default function Panel() {
             </Link>
             <Link
               to="/historial"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-cafe ring-1 ring-arena transition hover:bg-arena/40"
+              className="inline-flex items-center gap-2 rounded-full bg-terracota/15 px-6 py-3 font-medium text-terracota-oscuro shadow-sm ring-1 ring-terracota/60 transition hover:bg-terracota/25 hover:ring-terracota"
             >
               Ver pedidos
             </Link>

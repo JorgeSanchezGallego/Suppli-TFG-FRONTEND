@@ -51,17 +51,9 @@ export default function Navbar() {
       <nav className="mx-auto grid h-16 max-w-6xl grid-cols-3 items-center px-4 md:h-20">
         <div className="hidden items-center gap-6 md:flex">
           {usuario && (
-            <>
-              <NavLink to="/panel" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
-                Panel
-              </NavLink>
-              <NavLink to="/catalogo" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
-                Catálogo
-              </NavLink>
-              <NavLink to="/historial" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
-                Pedidos
-              </NavLink>
-            </>
+            <NavLink to="/panel" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
+              Panel
+            </NavLink>
           )}
         </div>
         <div className="md:hidden" />
@@ -119,14 +111,9 @@ export default function Navbar() {
         <div id="menu-movil" className="border-t border-arena px-4 pb-4 md:hidden">
           {usuario ? (
             <>
-              <Link to="/panel" className="block py-3 font-medium text-cafe">
-                Hola, {usuario.nombre}
-              </Link>
-              <Link to="/catalogo" className="block py-3 font-medium text-cafe">
-                Catálogo
-              </Link>
-              <Link to="/historial" className="mb-2 block py-3 font-medium text-cafe">
-                Pedidos
+              <p className="pt-3 text-sm text-cafe-suave">Hola, {usuario.nombre}</p>
+              <Link to="/panel" className="mb-2 block py-3 font-medium text-cafe">
+                Panel
               </Link>
               <button
                 type="button"
