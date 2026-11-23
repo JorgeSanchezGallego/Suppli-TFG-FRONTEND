@@ -2,7 +2,15 @@ const formatoEuros = new Intl.NumberFormat('es-ES', { style: 'currency', currenc
 
 export const euros = (cantidad) => formatoEuros.format(cantidad)
 
-export const capitalizar = (texto = '') => texto.charAt(0).toUpperCase() + texto.slice(1)
+const formatoNumero = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 })
+
+export const numero = (valor) => formatoNumero.format(valor)
+
+const formatoFecha = new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium', timeStyle: 'short' })
+
+export const fechaHora = (fecha) => formatoFecha.format(new Date(fecha))
+
+export const capitalizar =(texto = '') => texto.charAt(0).toUpperCase() + texto.slice(1)
 
 export function temporadaActual(fecha = new Date()) {
   const mes = fecha.getMonth()
@@ -28,4 +36,18 @@ export const diaDeHoy = (fecha = new Date()) => DIAS[fecha.getDay()]
 export const repartenHoy = (diasReparto = [], fecha = new Date()) =>
   diasReparto.some((dia) => normalizar(dia) === normalizar(diaDeHoy(fecha)))
 
-export const pasoCantidad = (medida = '') => (/\b(kg|l|litros?)\b/i.test(medida) ? 0.5 : 1)
+const ABREVIATURAS = /^(kg|g|l|cl|ml|ud|uds)$/i
+
+function pluralizarPalabra(palabra) {
+  if (ABREVIATURAS.test(palabra)) return palabra
+  if (/[aeiouáéó]$/i.test(palabra)) return `${palabra}s`
+  if (/z$/i.test(palabra)) return `${palabra.slice(0, -1)}ces`
+  return `${palabra}es`
+}
+
+export function cantidadConMedida(cantidad, medida = '') {
+  if (!medida) return numero(cantidad)
+  if (cantidad === 1) return `${numero(cantidad)} ${medida}`
+  const [primera, ...resto] = medida.split(' ')
+  return `${numero(cantidad)} ${[pluralizarPalabra(primera), ...resto].join(' ')}`
+}

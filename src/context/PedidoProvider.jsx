@@ -9,7 +9,15 @@ function leerPedido(usuarioId) {
   if (!usuarioId) return vacio
   try {
     const guardado = JSON.parse(localStorage.getItem(clave(usuarioId)))
-    if (guardado?.lineas) return guardado
+    if (guardado?.lineas) {
+      const lineas = Object.fromEntries(
+        Object.entries(guardado.lineas).map(([id, linea]) => [
+          id,
+          { ...linea, cantidad: Math.max(1, Math.round(linea.cantidad)) },
+        ]),
+      )
+      return { ...guardado, lineas }
+    }
   } catch {
     return vacio
   }

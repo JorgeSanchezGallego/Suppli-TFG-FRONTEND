@@ -29,14 +29,12 @@ export default function BarraPedido() {
           >
             Vaciar
           </button>
-          <button
-            type="button"
-            disabled
-            title="El envío por WhatsApp llega en el siguiente paso"
-            className="flex-1 rounded-full bg-terracota px-5 py-2.5 font-medium opacity-60 sm:flex-none"
+          <Link
+            to="/pedido"
+            className="flex-1 rounded-full bg-terracota px-5 py-2.5 text-center font-medium transition-colors hover:bg-terracota-oscuro sm:flex-none"
           >
             Revisar pedido
-          </button>
+          </Link>
         </div>
       </div>
     </div>

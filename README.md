@@ -159,6 +159,8 @@ La lista completa está en el README del backend.
 | `/register` | Público | Registro de una cuenta nueva. Al terminar, inicia sesión automáticamente |
 | `/panel` | Con sesión | Página de bienvenida con el nombre y el rol del usuario. Si es un empleado sin local, muestra un aviso para que pida al encargado que lo añada; si tiene locales, los muestra con su foto y su logo. Incluye un acceso directo al catálogo |
 | `/catalogo` | Con sesión | Vista general de todos los proveedores: contacto, días de reparto, número de productos y categorías. Tiene un buscador que encuentra proveedores y también productos (indicando a qué proveedor se piden) |
+| `/pedido` | Con sesión (empleado con local) | Revisión del pedido en curso: productos con su cantidad e importe, total, elección del local desde el que se pide, vista previa del mensaje y botón **Enviar por WhatsApp**, que guarda el pedido en la API y abre WhatsApp con el mensaje listo para el proveedor |
+| `/historial` | Con sesión | Historial de pedidos según el rol: el empleado ve los de sus locales (suyos y de sus compañeros), el encargado los de todos sus locales y el proveedor los que ha recibido su empresa. Cada pedido es una tarjeta con proveedor (o local), fecha, quién lo hizo, estado y total, que se despliega para ver los productos. Filtros por estado y por local, y botón para avanzar el estado según el rol |
 | `/catalogo/:proveedorId` | Con sesión | Productos de un proveedor, con buscador y filtro por categoría. Cada producto muestra su precio, proveedor y categoría, un icono de información que, al pasar el ratón, enseña el stock óptimo de invierno y verano y los días de reparto, y un selector de cantidad en su medida (lata, kg, barril…) |
 
 ### Diseño
@@ -184,9 +186,41 @@ La lista completa está en el README del backend.
 
 ### Pedidos: un proveedor cada vez
 
-Cada pedido va a **un solo proveedor**, igual que en la API. En el catálogo, el empleado va marcando cantidades y abajo aparece una barra con el pedido en curso: el proveedor, el número de productos y el total. Si intenta añadir un producto de otro proveedor, la app le avisa y le deja elegir entre seguir con el pedido actual o vaciarlo y empezar uno nuevo. El pedido en curso se guarda en `localStorage` para cada usuario, así que no se pierde al recargar.
+Cada pedido va a **un solo proveedor**, igual que en la API. En el catálogo, el empleado va marcando cantidades y abajo aparece una barra con el pedido en curso: el proveedor, el número de productos y el total. Además, en el menú superior hay un **carrito** con un contador de productos; al pulsarlo se abre una vista previa del pedido con cada producto, su cantidad y su importe, el total y la opción de quitar productos o vaciarlo. Si intenta añadir un producto de otro proveedor, la app le avisa y le deja elegir entre seguir con el pedido actual o vaciarlo y empezar uno nuevo. El pedido en curso se guarda en `localStorage` para cada usuario, así que no se pierde al recargar.
 
-Solo los **empleados con un local asignado** pueden preparar pedidos. Los demás usuarios pueden consultar el catálogo.
+Las cantidades son siempre **números enteros** (1, 2, 3…), igual que exige la API.
+
+### Envío por WhatsApp
+
+Desde **Revisar pedido** se llega a `/pedido`. Al pulsar **Enviar por WhatsApp**:
+
+1. El pedido se guarda en la API (`POST /api/pedidos`) con el local elegido, y queda como `pendiente` en el historial.
+2. Se abre `https://wa.me/<teléfono>?text=<mensaje>` con el teléfono del proveedor (se le añade el prefijo 34 si no lo tiene) y el mensaje ya escrito, para que el empleado solo tenga que pulsar enviar.
+3. El pedido en curso se vacía y se muestra una confirmación, con un botón para volver a abrir WhatsApp por si el navegador lo bloqueó.
+
+Ejemplo de mensaje:
+
+```
+Hola Luis, buenas tardes.
+Te escribo desde Noray para hacerte el siguiente pedido:
+
+- Aceitunas aliñadas: 1 kg
+- Limones: 2 kg
+- Patatas fritas: 1 bolsa 1kg
+```
+
+El saludo usa el nombre de la persona de contacto del proveedor y cambia según la hora (buenos días, buenas tardes o buenas noches).
+
+Solo los **empleados con un local asignado** pueden preparar pedidos.
+
+### Estados del pedido
+
+En el historial, cada pedido muestra su estado con un color (pendiente en ámbar, enviado en azul y entregado en verde). Al desplegarlo aparece el botón para pasar al siguiente estado, solo si el usuario puede hacerlo, siguiendo las mismas reglas que la API:
+
+| Cambio | Quién ve el botón |
+|---|---|
+| `pendiente` → `enviado` | El proveedor del pedido o el encargado del local |
+| `enviado` → `entregado` | El encargado o los empleados del local | Los demás usuarios pueden consultar el catálogo.
 
 ### Validaciones de los formularios
 
@@ -215,9 +249,9 @@ Los errores que devuelve la API, como "Usuario o contraseña incorrectos" o "El 
 - [x] Aviso en el panel para los empleados que aún no tienen bar asignado, y lista de sus locales para los que sí lo tienen
 - [x] **Catálogo** visual de productos, con búsqueda por nombre, categoría y proveedor
 - [x] **Pedido en curso** para ir sumando productos, siempre de un solo proveedor, que se mantiene al recargar la página
-- [ ] Pantalla para **revisar el pedido** y elegir el local antes de enviarlo
-- [ ] Envío del pedido al proveedor por **WhatsApp**, con el mensaje ya formateado
-- [ ] **Historial de pedidos** y cambio de estado (`pendiente` → `enviado` → `entregado`)
+- [x] Pantalla para **revisar el pedido** y elegir el local antes de enviarlo
+- [x] Envío del pedido al proveedor por **WhatsApp**, con el mensaje ya formateado
+- [x] **Historial de pedidos** y cambio de estado (`pendiente` → `enviado` → `entregado`)
 - [ ] Panel del **encargado**: gestión de bares y empleados
 - [ ] Panel del **proveedor**: gestión de su catálogo
 - [ ] Gestión de proveedores

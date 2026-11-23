@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import Logo from './Logo.jsx'
+import CarritoMenu from './CarritoMenu.jsx'
 
 export default function Navbar() {
   const { pathname } = useLocation()
@@ -26,6 +27,7 @@ export default function Navbar() {
   }, [])
 
   const transparente = pathname === '/' && !conFondo && !menuAbierto
+  const puedePedir = usuario?.role === 'empleado' && (usuario.bares ?? []).length > 0
 
   const enlace = transparente ? 'text-crema hover:text-white' : 'text-cafe-suave hover:text-cafe'
   const activo = transparente ? 'text-white' : 'text-terracota'
@@ -56,6 +58,9 @@ export default function Navbar() {
               <NavLink to="/catalogo" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
                 Catálogo
               </NavLink>
+              <NavLink to="/historial" className={({ isActive }) => `font-medium transition-colors ${isActive ? activo : enlace}`}>
+                Pedidos
+              </NavLink>
             </>
           )}
         </div>
@@ -65,7 +70,7 @@ export default function Navbar() {
           <Logo claro={transparente} />
         </Link>
 
-        <div className="justify-self-end">
+        <div className="flex items-center gap-2 justify-self-end md:gap-4">
           <div className="hidden items-center gap-6 md:flex">
             {usuario ? (
               <>
@@ -91,6 +96,8 @@ export default function Navbar() {
             )}
           </div>
 
+          {puedePedir && <CarritoMenu claro={transparente} />}
+
           <button
             type="button"
             onClick={() => setMenuAbiertoEn(menuAbierto ? null : pathname)}
@@ -115,8 +122,11 @@ export default function Navbar() {
               <Link to="/panel" className="block py-3 font-medium text-cafe">
                 Hola, {usuario.nombre}
               </Link>
-              <Link to="/catalogo" className="mb-2 block py-3 font-medium text-cafe">
+              <Link to="/catalogo" className="block py-3 font-medium text-cafe">
                 Catálogo
+              </Link>
+              <Link to="/historial" className="mb-2 block py-3 font-medium text-cafe">
+                Pedidos
               </Link>
               <button
                 type="button"

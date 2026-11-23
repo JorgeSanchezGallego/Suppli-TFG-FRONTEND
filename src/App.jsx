@@ -11,6 +11,8 @@ import QuienesSomos from './pages/QuienesSomos.jsx'
 import Panel from './pages/Panel.jsx'
 import Catalogo from './pages/Catalogo.jsx'
 import CatalogoProveedor from './pages/CatalogoProveedor.jsx'
+import Pedido from './pages/Pedido.jsx'
+import Historial from './pages/Historial.jsx'
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,8 @@ const router = createBrowserRouter([
           { path: 'panel', element: <Panel /> },
           { path: 'catalogo', element: <Catalogo /> },
           { path: 'catalogo/:proveedorId', element: <CatalogoProveedor /> },
+          { path: 'pedido', element: <Pedido /> },
+          { path: 'historial', element: <Historial /> },
         ],
       },
     ],

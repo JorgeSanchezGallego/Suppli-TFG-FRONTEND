@@ -66,13 +66,21 @@ export default function Panel() {
         <AvisoSinLocal />
       ) : (
         <>
-          <Link
-            to="/catalogo"
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-terracota px-6 py-3 font-medium text-crema shadow-[0_12px_30px_-10px_rgb(194_100_60/0.7)] transition hover:bg-terracota-oscuro"
-          >
-            Ir al catálogo
-            <span aria-hidden="true">→</span>
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              to="/catalogo"
+              className="inline-flex items-center gap-2 rounded-full bg-terracota px-6 py-3 font-medium text-crema shadow-[0_12px_30px_-10px_rgb(194_100_60/0.7)] transition hover:bg-terracota-oscuro"
+            >
+              Ir al catálogo
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link
+              to="/historial"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium text-cafe ring-1 ring-arena transition hover:bg-arena/40"
+            >
+              Ver pedidos
+            </Link>
+          </div>
           {esEmpleado && bares.length > 0 && <MisLocales bares={bares} />}
         </>
       )}
