@@ -157,10 +157,13 @@ La lista completa está en el README del backend.
 | `/quienes-somos` | Público | Origen del proyecto, el problema que resuelve, la solución y quién está detrás |
 | `/login` | Público | Inicio de sesión. Si ya hay sesión, redirige a `/panel` |
 | `/register` | Público | Registro de una cuenta nueva. Al terminar, inicia sesión automáticamente |
-| `/panel` | Con sesión | Página de bienvenida con el nombre y el rol del usuario. Si es un empleado sin local, muestra un aviso para que pida al encargado que lo añada; si tiene locales, los muestra con su foto y su logo. Incluye un acceso directo al catálogo |
+| `/panel` | Con sesión | Página de inicio de cada rol. **Empleado:** aviso si aún no tiene local, sus locales con foto y logo, y accesos al catálogo y a los pedidos. **Encargado:** resumen con el número de locales, empleados (lleva a la lista de empleados) y pedidos pendientes, aviso si hay empleados registrados esperando un local, sus locales con foto, y accesos a la gestión de locales, los pedidos y el catálogo |
+| `/mis-locales` | Encargado | Lista de los locales del encargado, con sus empleados y pedidos pendientes, y formulario para crear uno nuevo (nombre, dirección y foto opcional con vista previa; la dirección no se puede cambiar después). Los locales sin foto muestran su nombre sobre un fondo terracota |
+| `/mis-locales/:id` | Encargado | Gestión de un local: ver, añadir y quitar a sus encargados (o dejar de gestionarlo uno mismo), cambiar el nombre, añadir o cambiar la foto (se usa como fondo de la cabecera), ver y quitar empleados, buscar entre todos los empleados (por nombre, apellidos o correo) para añadirlos, y borrar el local con una confirmación en la que hay que escribir su nombre |
+| `/empleados` | Encargado | Todo el equipo (empleados y encargados; los proveedores tienen su propio filtro), en fichas con su nombre, los locales en los que trabajan, correo, teléfono, residencia, edad y fecha de alta. Filtros "Todos", "En mis locales", "Sin local", "Encargados" y "Proveedores", buscador por nombre, correo, teléfono o residencia, un selector para añadir a cada empleado a uno de tus locales (o, si es encargado, añadirlo como encargado de uno de tus locales) y la opción **Cambiar rol** en cada ficha (empleado, encargado o proveedor con su empresa), que explica qué implica cada cambio antes de guardarlo |
 | `/catalogo` | Con sesión | Vista general de todos los proveedores: contacto, días de reparto, número de productos y categorías. Tiene un buscador que encuentra proveedores y también productos (indicando a qué proveedor se piden) |
 | `/pedido` | Con sesión (empleado con local) | Revisión del pedido en curso: productos con su cantidad e importe, total, elección del local desde el que se pide, vista previa del mensaje y botón **Enviar por WhatsApp**, que guarda el pedido en la API y abre WhatsApp con el mensaje listo para el proveedor |
-| `/historial` | Con sesión | Historial de pedidos según el rol: el empleado ve los de sus locales (suyos y de sus compañeros), el encargado los de todos sus locales y el proveedor los que ha recibido su empresa. Cada pedido es una tarjeta con proveedor (o local), fecha, quién lo hizo, estado y total, que se despliega para ver los productos. Filtros por estado y por local, y botón para marcar como entregado los pedidos pendientes (encargado y empleados del local) |
+| `/historial` | Con sesión | Historial de pedidos según el rol: el empleado ve los de sus locales (suyos y de sus compañeros), el encargado los de todos sus locales y el proveedor los que ha recibido su empresa. Cada pedido es una tarjeta con proveedor (o local), fecha, quién lo hizo, estado y total, que se despliega para ver los productos. Filtros por estado y por local, se muestran 20 pedidos y un botón "Ver más" carga los siguientes, y botón para marcar como entregado los pedidos pendientes (encargado y empleados del local) |
 | `/catalogo/:proveedorId` | Con sesión | Productos de un proveedor, con buscador y filtro por categoría. Cada producto muestra su precio, proveedor y categoría, un icono de información que, al pasar el ratón, enseña el stock óptimo de invierno y verano y los días de reparto, y un selector de cantidad en su medida (lata, kg, barril…) |
 
 ### Diseño
@@ -183,6 +186,18 @@ La lista completa está en el README del backend.
 - Con la sesión iniciada, el menú muestra un único enlace, **Panel**, además del nombre del usuario, el carrito (para empleados con local) y el botón **Cerrar sesión**. El resto de secciones (catálogo, pedidos…) se abren desde el panel, para que el menú no crezca con cada página nueva.
 
 > **Sobre el registro:** todo el que se registra entra como `empleado` y sin bar asignado. Puede iniciar sesión, pero no puede hacer pedidos hasta que el encargado de un bar lo añada a su local. Es una decisión de seguridad: así nadie de fuera puede hacer pedidos en nombre de un local.
+
+### Gestión de locales (encargado)
+
+El encargado es quien da acceso a los empleados: alguien que se registra entra como empleado sin local y no puede hacer pedidos hasta que el encargado lo añade a uno de sus locales. Por eso el panel del encargado avisa cuando hay empleados esperando, y en la página de cada local el buscador muestra primero a los que aún no tienen local.
+
+La foto de cada local se guarda en la API (Cloudinary), así que se mantiene aunque se cambie el nombre. Para los tres locales de ejemplo del seed, que no tienen foto en la base de datos, la app usa las fotos de la landing.
+
+**Cambio de rol.** Desde la página de empleados, el encargado puede cambiar el rol de cualquier persona salvo el suyo, usando las reglas de la API: al pasar a encargado o proveedor deja sus locales de empleado, al pasar a proveedor hay que elegir su empresa, y un encargado que es el único de algún local no puede dejar de serlo hasta que haya otro encargado.
+
+Un local puede tener **varios encargados**, todos con los mismos permisos. En la página de cada local, la sección "Encargados del local" permite añadir a otro usuario con rol de encargado, quitarlo o dejar de gestionar el local uno mismo; un local nunca puede quedarse sin encargados. En las tarjetas de los locales compartidos aparece "También lo gestiona…".
+
+Un empleado puede trabajar en varios locales. Al borrar un local, la API borra también sus pedidos y lo quita de sus empleados, así que la app pide confirmarlo escribiendo el nombre del local. Las páginas de gestión solo están disponibles para encargados; cualquier otro rol que intente entrar vuelve al panel.
 
 ### Pedidos: un proveedor cada vez
 
@@ -247,7 +262,7 @@ Los errores que devuelve la API, como "Usuario o contraseña incorrectos" o "El 
 - [x] Pantalla para **revisar el pedido** y elegir el local antes de enviarlo
 - [x] Envío del pedido al proveedor por **WhatsApp**, con el mensaje ya formateado
 - [x] **Historial de pedidos** y cambio de estado (`pendiente` → `entregado`)
-- [ ] Panel del **encargado**: gestión de bares y empleados
+- [x] Panel del **encargado**: resumen, gestión de locales y de sus empleados
 - [ ] Panel del **proveedor**: gestión de su catálogo
 - [ ] Gestión de proveedores
 

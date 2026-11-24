@@ -6,6 +6,8 @@ import TarjetaPedido from '../components/historial/TarjetaPedido.jsx'
 import { ESTADOS } from '../components/historial/estados.js'
 import fotoCabecera from '../assets/img/hero.jpg'
 
+const POR_PAGINA = 20
+
 const SUBTITULOS = {
   empleado: 'Los pedidos de tus locales, hechos por ti o por tus compañeros.',
   encargado: 'Todos los pedidos de tus locales.',
@@ -19,6 +21,17 @@ export default function Historial() {
   const [error, setError] = useState('')
   const [estado, setEstado] = useState('')
   const [local, setLocal] = useState('')
+  const [limite, setLimite] = useState(POR_PAGINA)
+
+  const filtrarEstado = (valor) => {
+    setEstado(valor)
+    setLimite(POR_PAGINA)
+  }
+
+  const filtrarLocal = (valor) => {
+    setLocal(valor)
+    setLimite(POR_PAGINA)
+  }
 
   const sinLocal = usuario.role === 'empleado' && (usuario.bares ?? []).length === 0
 
@@ -47,6 +60,8 @@ export default function Historial() {
 
   const delLocal = local ? pedidos.filter((p) => p.bar?._id === local) : pedidos
   const visibles = estado ? delLocal.filter((p) => p.estado === estado) : delLocal
+  const mostrados = visibles.slice(0, limite)
+  const restantes = visibles.length - mostrados.length
   const cuenta = (e) => delLocal.filter((p) => p.estado === e).length
 
   const cambiarEstado = async (pedido, nuevo) => {
@@ -81,14 +96,14 @@ export default function Historial() {
           {!cargando && !error && pedidos.length > 0 && (
             <div className="mt-8 space-y-3">
               <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filtrar por estado">
-                <button type="button" onClick={() => setEstado('')} aria-pressed={!estado} className={chip(!estado)}>
+                <button type="button" onClick={() => filtrarEstado('')} aria-pressed={!estado} className={chip(!estado)}>
                   Todos ({delLocal.length})
                 </button>
                 {Object.entries(ESTADOS).map(([clave, { texto }]) => (
                   <button
                     key={clave}
                     type="button"
-                    onClick={() => setEstado(estado === clave ? '' : clave)}
+                    onClick={() => filtrarEstado(estado === clave ? '' : clave)}
                     aria-pressed={estado === clave}
                     className={chip(estado === clave)}
                   >
@@ -99,14 +114,14 @@ export default function Historial() {
 
               {locales.length > 1 && (
                 <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filtrar por local">
-                  <button type="button" onClick={() => setLocal('')} aria-pressed={!local} className={chip(!local)}>
+                  <button type="button" onClick={() => filtrarLocal('')} aria-pressed={!local} className={chip(!local)}>
                     Todos los locales
                   </button>
                   {locales.map(([idLocal, nombre]) => (
                     <button
                       key={idLocal}
                       type="button"
-                      onClick={() => setLocal(local === idLocal ? '' : idLocal)}
+                      onClick={() => filtrarLocal(local === idLocal ? '' : idLocal)}
                       aria-pressed={local === idLocal}
                       className={chip(local === idLocal)}
                     >
@@ -145,12 +160,29 @@ export default function Historial() {
           )}
 
           <ul className="mt-6 space-y-4">
-            {visibles.map((pedido) => (
+            {mostrados.map((pedido) => (
               <li key={pedido._id}>
                 <TarjetaPedido pedido={pedido} role={usuario.role} onCambiarEstado={cambiarEstado} />
               </li>
             ))}
           </ul>
+
+          {visibles.length > POR_PAGINA && (
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <p className="text-sm text-cafe-suave">
+                Mostrando {mostrados.length} de {visibles.length} pedidos
+              </p>
+              {restantes > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setLimite(limite + POR_PAGINA)}
+                  className="rounded-full bg-terracota/15 px-6 py-3 font-medium text-terracota-oscuro shadow-sm ring-1 ring-terracota/60 transition hover:bg-terracota/25 hover:ring-terracota"
+                >
+                  Ver {Math.min(restantes, POR_PAGINA)} más
+                </button>
+              )}
+            </div>
+          )}
         </>
       )}
     </section>

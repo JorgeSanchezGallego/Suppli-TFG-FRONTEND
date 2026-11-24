@@ -54,3 +54,13 @@ export function fechaNacimiento(valor) {
 export function sinErrores(errores) {
   return Object.values(errores).every((error) => !error)
 }
+
+export const FORMATOS_FOTO = 'image/jpeg,image/png,image/gif,image/webp'
+const MAX_MB_FOTO = 5
+
+export function validarFoto(archivo) {
+  if (!archivo) return ''
+  if (!FORMATOS_FOTO.split(',').includes(archivo.type)) return 'La foto tiene que ser JPG, PNG, GIF o WEBP.'
+  if (archivo.size > MAX_MB_FOTO * 1024 * 1024) return `La foto no puede pesar más de ${MAX_MB_FOTO} MB.`
+  return ''
+}

@@ -67,4 +67,8 @@ export function buscarLocal(nombre) {
   return locales.find((local) => normalizar(local.nombre) === buscado) ?? null
 }
 
+export function fotoDelLocal(bar) {
+  return bar?.imagen || buscarLocal(bar?.nombre)?.fotos[0] || ''
+}
+
 export default locales

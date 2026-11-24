@@ -13,6 +13,10 @@ import Catalogo from './pages/Catalogo.jsx'
 import CatalogoProveedor from './pages/CatalogoProveedor.jsx'
 import Pedido from './pages/Pedido.jsx'
 import Historial from './pages/Historial.jsx'
+import MisLocales from './pages/MisLocales.jsx'
+import DetalleLocal from './pages/DetalleLocal.jsx'
+import Empleados from './pages/Empleados.jsx'
+import RutaEncargado from './components/RutaEncargado.jsx'
 
 const router = createBrowserRouter([
   {
@@ -31,6 +35,14 @@ const router = createBrowserRouter([
           { path: 'catalogo/:proveedorId', element: <CatalogoProveedor /> },
           { path: 'pedido', element: <Pedido /> },
           { path: 'historial', element: <Historial /> },
+          {
+            element: <RutaEncargado />,
+            children: [
+              { path: 'mis-locales', element: <MisLocales /> },
+              { path: 'mis-locales/:id', element: <DetalleLocal /> },
+              { path: 'empleados', element: <Empleados /> },
+            ],
+          },
         ],
       },
     ],
