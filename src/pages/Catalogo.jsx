@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import { usePedido } from '../context/usePedido.js'
 import { useCatalogo } from '../hooks/useCatalogo.js'
@@ -9,6 +10,8 @@ import ListaProductos from '../components/catalogo/ListaProductos.jsx'
 import BarraPedido from '../components/catalogo/BarraPedido.jsx'
 import { normalizar, repartenHoy } from '../utils/formato.js'
 import fotoCabecera from '../assets/img/hero.jpg'
+import { localesParaPedir } from '../utils/pedidos.js'
+import Volver from '../components/Volver.jsx'
 
 export default function Catalogo() {
   const { usuario } = useAuth()
@@ -19,7 +22,7 @@ export default function Catalogo() {
   const [busqueda, setBusqueda] = useState('')
 
   const esEmpleado = usuario.role === 'empleado'
-  const puedePedir = esEmpleado && (usuario.bares ?? []).length > 0
+  const puedePedir = localesParaPedir(usuario).length > 0
   const texto = normalizar(busqueda)
 
   const diasPorProveedor = useMemo(
@@ -46,6 +49,7 @@ export default function Catalogo() {
 
   return (
     <section className={`mx-auto max-w-6xl px-4 pt-28 ${pedido.numProductos > 0 ? 'pb-48' : 'pb-20'}`}>
+      <Volver />
       <header className="relative overflow-hidden rounded-[2rem] bg-cafe px-6 py-10 shadow-[0_30px_70px_-20px_rgb(43_33_27/0.55)] sm:px-10 md:px-14 md:py-14">
         <img src={fotoCabecera} alt="" className="absolute inset-0 size-full object-cover opacity-35" />
         <div className="absolute inset-0 bg-linear-to-r from-cafe via-cafe/85 to-terracota/50" />
@@ -56,6 +60,15 @@ export default function Catalogo() {
           <p className="mt-3 text-crema/80 md:text-lg">
             Elige un proveedor para ver sus productos, o busca directamente lo que necesitas y te diremos a quién se pide.
           </p>
+
+          {usuario.role === 'encargado' && (
+            <Link
+              to="/proveedores/nuevo"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-crema px-5 py-2.5 text-sm font-medium text-cafe transition hover:bg-white"
+            >
+              <span aria-hidden="true">+</span> Nuevo proveedor
+            </Link>
+          )}
 
           <Buscador
             className="mt-7 max-w-md"

@@ -19,3 +19,7 @@ export function obtenerHistorial(token) {
 export function cambiarEstadoPedido(token, id, estado) {
   return peticion(`/pedidos/${id}/estado`, { metodo: 'PATCH', token, cuerpo: { estado } })
 }
+
+export function borrarPedido(token, id) {
+  return peticion(`/pedidos/${id}`, { metodo: 'DELETE', token })
+}

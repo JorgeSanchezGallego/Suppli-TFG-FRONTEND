@@ -7,11 +7,18 @@ import { crearPedido } from '../api/pedidos.js'
 import SelectorCantidad from '../components/catalogo/SelectorCantidad.jsx'
 import { cantidadConMedida, euros } from '../utils/formato.js'
 import { enlaceWhatsApp, mensajePedido } from '../utils/whatsapp.js'
+import { localesParaPedir } from '../utils/pedidos.js'
+import Volver from '../components/Volver.jsx'
 
 const tarjeta = 'rounded-3xl bg-white p-6 shadow-[0_24px_60px_-15px_rgb(43_33_27/0.22)] md:p-8'
 
 function Contenedor({ children }) {
-  return <section className="mx-auto max-w-5xl px-4 pt-32 pb-20">{children}</section>
+  return (
+    <section className="mx-auto max-w-5xl px-4 pt-32 pb-20">
+      <Volver />
+      {children}
+    </section>
+  )
 }
 
 function PedidoEnviado({ enviado }) {
@@ -52,8 +59,8 @@ function PedidoEnviado({ enviado }) {
 export default function Pedido() {
   const { usuario, token } = useAuth()
   const pedido = usePedido()
-  const bares = (usuario.bares ?? []).filter((bar) => typeof bar === 'object')
-  const puedePedir = usuario.role === 'empleado' && bares.length > 0
+  const bares = localesParaPedir(usuario)
+  const puedePedir = bares.length > 0
 
   const [proveedor, setProveedor] = useState(null)
   const [errorProveedor, setErrorProveedor] = useState('')
@@ -86,7 +93,11 @@ export default function Pedido() {
       <Contenedor>
         <div className={`${tarjeta} text-center`}>
           <h1 className="text-2xl font-semibold">Aún no puedes hacer pedidos</h1>
-          <p className="mt-2 text-cafe-suave">Tu encargado tiene que añadirte a tu local.</p>
+          <p className="mt-2 text-cafe-suave">
+            {usuario.role === 'encargado'
+              ? 'Crea tu primer local para poder hacer pedidos.'
+              : 'Tu encargado tiene que añadirte a tu local.'}
+          </p>
         </div>
       </Contenedor>
     )
@@ -138,12 +149,7 @@ export default function Pedido() {
 
   return (
     <section className="mx-auto max-w-5xl px-4 pt-32 pb-20">
-      <Link
-        to={`/catalogo/${proveedorId}`}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-terracota hover:text-terracota-oscuro"
-      >
-        ← Seguir añadiendo productos
-      </Link>
+      <Volver className="" />
       <h1 className="mt-4 text-4xl font-semibold md:text-5xl">Revisa tu pedido</h1>
       <p className="mt-2 text-lg text-cafe-suave">
         Pedido a <strong className="text-cafe">{pedido.proveedor.nombre_empresa}</strong>

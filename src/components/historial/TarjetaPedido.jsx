@@ -16,9 +16,11 @@ function EstadoYTotal({ estado, total, unidades }) {
   )
 }
 
-export default function TarjetaPedido({ pedido, role, onCambiarEstado }) {
+export default function TarjetaPedido({ pedido, role, onCambiarEstado, onBorrar }) {
   const [abierta, setAbierta] = useState(false)
   const [cambiando, setCambiando] = useState(false)
+  const [confirmandoBorrado, setConfirmandoBorrado] = useState(false)
+  const [borrando, setBorrando] = useState(false)
   const [error, setError] = useState('')
   const id = useId()
 
@@ -38,6 +40,17 @@ export default function TarjetaPedido({ pedido, role, onCambiarEstado }) {
       setError(e.message)
     } finally {
       setCambiando(false)
+    }
+  }
+
+  const borrar = async () => {
+    setBorrando(true)
+    setError('')
+    try {
+      await onBorrar(pedido)
+    } catch (e) {
+      setError(e.message)
+      setBorrando(false)
     }
   }
 
@@ -114,17 +127,55 @@ export default function TarjetaPedido({ pedido, role, onCambiarEstado }) {
             </p>
           )}
 
-          {siguiente && (
-            <div className="mt-4 flex justify-end">
-              <button
-                type="button"
-                onClick={avanzar}
-                disabled={cambiando}
-                className="rounded-full bg-terracota px-5 py-2.5 text-sm font-medium text-crema transition-colors hover:bg-terracota-oscuro disabled:cursor-wait disabled:opacity-70"
-              >
-                {cambiando ? 'Guardando…' : `Marcar como ${ESTADOS[siguiente].texto.toLowerCase()}`}
-              </button>
+          {confirmandoBorrado ? (
+            <div role="alert" className="mt-4 rounded-2xl bg-red-50 p-4">
+              <p className="text-sm font-medium text-red-800">¿Borrar este pedido? No se puede deshacer.</p>
+              <p className="mt-1 text-sm text-red-700/80">
+                Si ya lo enviaste por WhatsApp, avisa a {pedido.proveedor?.nombre_empresa ?? 'el proveedor'} de que lo anulas.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={borrar}
+                  disabled={borrando}
+                  className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  {borrando ? 'Borrando…' : 'Sí, borrar'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmandoBorrado(false)}
+                  disabled={borrando}
+                  className="rounded-full px-4 py-2 text-sm font-medium text-cafe-suave hover:bg-white/60"
+                >
+                  No
+                </button>
+              </div>
             </div>
+          ) : (
+            (onBorrar || siguiente) && (
+              <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+                {onBorrar && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmandoBorrado(true)}
+                    className="rounded-full border border-red-300 bg-white px-5 py-2.5 text-sm font-medium text-red-700 transition hover:border-red-400 hover:bg-red-50"
+                  >
+                    Borrar pedido
+                  </button>
+                )}
+                {siguiente && (
+                  <button
+                    type="button"
+                    onClick={avanzar}
+                    disabled={cambiando}
+                    className="rounded-full bg-terracota px-5 py-2.5 text-sm font-medium text-crema transition-colors hover:bg-terracota-oscuro disabled:cursor-wait disabled:opacity-70"
+                  >
+                    {cambiando ? 'Guardando…' : `Marcar como ${ESTADOS[siguiente].texto.toLowerCase()}`}
+                  </button>
+                )}
+              </div>
+            )
           )}
         </div>
       )}

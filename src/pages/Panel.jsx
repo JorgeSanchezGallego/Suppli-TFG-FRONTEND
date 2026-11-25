@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import TarjetaMiLocal from '../components/TarjetaMiLocal.jsx'
 import PanelEncargado from '../components/encargado/PanelEncargado.jsx'
+import PanelProveedor from '../components/proveedor/PanelProveedor.jsx'
 
 const roles = {
   empleado: 'Empleado',
@@ -65,6 +66,8 @@ export default function Panel() {
 
       {usuario.role === 'encargado' ? (
         <PanelEncargado />
+      ) : usuario.role === 'proveedor' ? (
+        <PanelProveedor />
       ) : sinLocal ? (
         <AvisoSinLocal />
       ) : (

@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
-import { cambiarEstadoPedido, obtenerHistorial } from '../api/pedidos.js'
+import { borrarPedido, cambiarEstadoPedido, obtenerHistorial } from '../api/pedidos.js'
 import TarjetaPedido from '../components/historial/TarjetaPedido.jsx'
-import { ESTADOS } from '../components/historial/estados.js'
+import { ESTADOS, puedeBorrar } from '../components/historial/estados.js'
 import fotoCabecera from '../assets/img/hero.jpg'
+import Volver from '../components/Volver.jsx'
 
 const POR_PAGINA = 20
 
 const SUBTITULOS = {
   empleado: 'Los pedidos de tus locales, hechos por ti o por tus compañeros.',
   encargado: 'Todos los pedidos de tus locales.',
-  proveedor: 'Los pedidos que han hecho a tu empresa.',
+  proveedor: 'Los pedidos que te han hecho los bares. Ábrelos para ver qué llevar y a qué dirección.',
 }
 
 export default function Historial() {
@@ -69,6 +70,11 @@ export default function Historial() {
     setPedidos((lista) => lista.map((p) => (p._id === pedido._id ? { ...p, ...actualizado } : p)))
   }
 
+  const borrar = async (pedido) => {
+    await borrarPedido(token, pedido._id)
+    setPedidos((lista) => lista.filter((p) => p._id !== pedido._id))
+  }
+
   const chip = (activa) =>
     `shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
       activa ? 'bg-terracota text-crema' : 'bg-white text-cafe-suave ring-1 ring-arena hover:text-cafe'
@@ -76,12 +82,15 @@ export default function Historial() {
 
   return (
     <section className="mx-auto max-w-5xl px-4 pt-28 pb-20">
+      <Volver />
       <header className="relative overflow-hidden rounded-[2rem] bg-cafe px-6 py-10 shadow-[0_30px_70px_-20px_rgb(43_33_27/0.55)] sm:px-10 md:px-14 md:py-12">
         <img src={fotoCabecera} alt="" className="absolute inset-0 size-full object-cover opacity-35" />
         <div className="absolute inset-0 bg-linear-to-r from-cafe via-cafe/85 to-terracota/50" />
         <div className="relative max-w-2xl">
           <p className="text-sm font-medium tracking-[0.25em] text-crema/70 uppercase">Historial</p>
-          <h1 className="mt-2 text-4xl font-semibold text-crema md:text-5xl">Pedidos</h1>
+          <h1 className="mt-2 text-4xl font-semibold text-crema md:text-5xl">
+            {usuario.role === 'proveedor' ? 'Pedidos recibidos' : 'Pedidos'}
+          </h1>
           <p className="mt-3 text-crema/80 md:text-lg">{SUBTITULOS[usuario.role]}</p>
         </div>
       </header>
@@ -95,7 +104,7 @@ export default function Historial() {
         <>
           {!cargando && !error && pedidos.length > 0 && (
             <div className="mt-8 space-y-3">
-              <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filtrar por estado">
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por estado">
                 <button type="button" onClick={() => filtrarEstado('')} aria-pressed={!estado} className={chip(!estado)}>
                   Todos ({delLocal.length})
                 </button>
@@ -113,7 +122,7 @@ export default function Historial() {
               </div>
 
               {locales.length > 1 && (
-                <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filtrar por local">
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por local">
                   <button type="button" onClick={() => filtrarLocal('')} aria-pressed={!local} className={chip(!local)}>
                     Todos los locales
                   </button>
@@ -162,7 +171,12 @@ export default function Historial() {
           <ul className="mt-6 space-y-4">
             {mostrados.map((pedido) => (
               <li key={pedido._id}>
-                <TarjetaPedido pedido={pedido} role={usuario.role} onCambiarEstado={cambiarEstado} />
+                <TarjetaPedido
+                  pedido={pedido}
+                  role={usuario.role}
+                  onCambiarEstado={cambiarEstado}
+                  onBorrar={puedeBorrar(pedido, usuario) ? borrar : undefined}
+                />
               </li>
             ))}
           </ul>

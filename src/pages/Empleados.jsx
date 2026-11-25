@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import { useEncargado } from '../hooks/useEncargado.js'
 import { añadirEmpleado, añadirEncargado } from '../api/bares.js'
@@ -9,6 +9,7 @@ import Buscador from '../components/catalogo/Buscador.jsx'
 import FichaEmpleado from '../components/encargado/FichaEmpleado.jsx'
 import { tarjeta } from '../components/estilos.js'
 import { normalizar } from '../utils/formato.js'
+import Volver from '../components/Volver.jsx'
 
 const FILTROS = [
   { clave: 'todos', texto: 'Todos' },
@@ -80,9 +81,7 @@ export default function Empleados() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 pt-28 pb-20">
-      <Link to="/panel" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-terracota hover:text-terracota-oscuro">
-        ← Volver al panel
-      </Link>
+      <Volver />
 
       <CabeceraOscura etiqueta="Gestión" titulo="Empleados">
         <p className="mt-3 max-w-2xl text-crema/80 md:text-lg">
@@ -114,7 +113,7 @@ export default function Empleados() {
       {!cargando && !error && (
         <>
           <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0" role="group" aria-label="Filtrar empleados">
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar empleados">
               {FILTROS.map(({ clave, texto }) => (
                 <button
                   key={clave}

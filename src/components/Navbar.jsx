@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import Logo from './Logo.jsx'
 import CarritoMenu from './CarritoMenu.jsx'
+import { localesParaPedir } from '../utils/pedidos.js'
 
 export default function Navbar() {
   const { pathname } = useLocation()
@@ -27,7 +28,7 @@ export default function Navbar() {
   }, [])
 
   const transparente = pathname === '/' && !conFondo && !menuAbierto
-  const puedePedir = usuario?.role === 'empleado' && (usuario.bares ?? []).length > 0
+  const puedePedir = localesParaPedir(usuario).length > 0
 
   const enlace = transparente ? 'text-crema hover:text-white' : 'text-cafe-suave hover:text-cafe'
   const activo = transparente ? 'text-white' : 'text-terracota'
@@ -108,35 +109,49 @@ export default function Navbar() {
       </nav>
 
       {menuAbierto && (
-        <div id="menu-movil" className="border-t border-arena px-4 pb-4 md:hidden">
-          {usuario ? (
-            <>
-              <p className="pt-3 text-sm text-cafe-suave">Hola, {usuario.nombre}</p>
-              <Link to="/panel" className="mb-2 block py-3 font-medium text-cafe">
-                Panel
-              </Link>
-              <button
-                type="button"
-                onClick={salir}
-                className="block w-full rounded-full border border-cafe/20 py-3 text-center font-medium text-cafe"
-              >
-                Cerrar sesión
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="block py-3 font-medium text-cafe">
-                Iniciar sesión
-              </Link>
-              <Link
-                to="/register"
-                className="block rounded-full bg-terracota py-3 text-center font-medium text-crema"
-              >
-                Registrarse
-              </Link>
-            </>
-          )}
-        </div>
+        <>
+          <div
+            aria-hidden="true"
+            onClick={() => setMenuAbiertoEn(null)}
+            className="absolute inset-x-0 top-full h-screen bg-cafe/40 backdrop-blur-[2px] md:hidden"
+          />
+          <div
+            id="menu-movil"
+            className="relative mx-3 mb-3 rounded-3xl bg-white p-4 shadow-[0_24px_50px_-12px_rgb(43_33_27/0.45)] ring-1 ring-arena md:hidden"
+          >
+            {usuario ? (
+              <>
+                <p className="px-2 text-sm text-cafe-suave">Hola, {usuario.nombre}</p>
+                <Link
+                  to="/panel"
+                  className="mt-2 flex items-center justify-between rounded-2xl bg-terracota/10 px-4 py-3 font-medium text-terracota-oscuro"
+                >
+                  Panel
+                  <span aria-hidden="true">→</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={salir}
+                  className="mt-3 block w-full rounded-full border border-cafe/20 py-3 text-center font-medium text-cafe"
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="block rounded-2xl px-4 py-3 font-medium text-cafe hover:bg-arena/40">
+                  Iniciar sesión
+                </Link>
+                <Link
+                  to="/register"
+                  className="mt-2 block rounded-full bg-terracota py-3 text-center font-medium text-crema"
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
+          </div>
+        </>
       )}
     </header>
   )

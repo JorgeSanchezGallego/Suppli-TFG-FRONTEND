@@ -17,6 +17,12 @@ import MisLocales from './pages/MisLocales.jsx'
 import DetalleLocal from './pages/DetalleLocal.jsx'
 import Empleados from './pages/Empleados.jsx'
 import RutaEncargado from './components/RutaEncargado.jsx'
+import RutaProveedor from './components/RutaProveedor.jsx'
+import RutaNoProveedor from './components/RutaNoProveedor.jsx'
+import MiCatalogo from './pages/MiCatalogo.jsx'
+import MiEmpresa from './pages/MiEmpresa.jsx'
+import GestionarCatalogo from './pages/GestionarCatalogo.jsx'
+import NuevoProveedor from './pages/NuevoProveedor.jsx'
 
 const router = createBrowserRouter([
   {
@@ -31,9 +37,14 @@ const router = createBrowserRouter([
         element: <RutaPrivada />,
         children: [
           { path: 'panel', element: <Panel /> },
-          { path: 'catalogo', element: <Catalogo /> },
+          {
+            element: <RutaNoProveedor />,
+            children: [
+              { path: 'catalogo', element: <Catalogo /> },
+              { path: 'pedido', element: <Pedido /> },
+            ],
+          },
           { path: 'catalogo/:proveedorId', element: <CatalogoProveedor /> },
-          { path: 'pedido', element: <Pedido /> },
           { path: 'historial', element: <Historial /> },
           {
             element: <RutaEncargado />,
@@ -41,6 +52,15 @@ const router = createBrowserRouter([
               { path: 'mis-locales', element: <MisLocales /> },
               { path: 'mis-locales/:id', element: <DetalleLocal /> },
               { path: 'empleados', element: <Empleados /> },
+              { path: 'catalogo/:proveedorId/gestionar', element: <GestionarCatalogo /> },
+              { path: 'proveedores/nuevo', element: <NuevoProveedor /> },
+            ],
+          },
+          {
+            element: <RutaProveedor />,
+            children: [
+              { path: 'mi-catalogo', element: <MiCatalogo /> },
+              { path: 'mi-empresa', element: <MiEmpresa /> },
             ],
           },
         ],

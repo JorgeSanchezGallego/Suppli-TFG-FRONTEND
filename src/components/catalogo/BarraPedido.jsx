@@ -9,11 +9,11 @@ export default function BarraPedido() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
-      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-3xl bg-cafe p-4 text-crema shadow-[0_24px_60px_-10px_rgb(43_33_27/0.6)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-3xl bg-white p-4 text-cafe shadow-[0_24px_60px_-10px_rgb(43_33_27/0.55)] ring-2 ring-terracota sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
-          <p className="text-xs font-medium tracking-[0.2em] text-crema/70 uppercase">
+          <p className="text-xs font-medium tracking-[0.2em] text-terracota uppercase">
             Pedido a{' '}
-            <Link to={`/catalogo/${proveedor?._id}`} className="underline decoration-crema/40 underline-offset-4 hover:text-crema">
+            <Link to={`/catalogo/${proveedor?._id}`} className="underline decoration-terracota/40 underline-offset-4 hover:text-terracota-oscuro">
               {proveedor?.nombre_empresa}
             </Link>
           </p>
@@ -25,13 +25,13 @@ export default function BarraPedido() {
           <button
             type="button"
             onClick={vaciar}
-            className="flex-1 rounded-full border border-crema/30 px-5 py-2.5 font-medium transition hover:bg-crema/10 sm:flex-none"
+            className="flex-1 rounded-full border border-cafe/20 px-5 py-2.5 font-medium text-cafe transition hover:bg-arena/40 sm:flex-none"
           >
             Vaciar
           </button>
           <Link
             to="/pedido"
-            className="flex-1 rounded-full bg-terracota px-5 py-2.5 text-center font-medium transition-colors hover:bg-terracota-oscuro sm:flex-none"
+            className="flex-1 rounded-full bg-terracota px-5 py-2.5 text-center font-medium text-crema transition-colors hover:bg-terracota-oscuro sm:flex-none"
           >
             Revisar pedido
           </Link>

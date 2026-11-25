@@ -12,16 +12,9 @@ import EncargadosLocal from '../components/encargado/EncargadosLocal.jsx'
 import { fotoDelLocal } from '../data/locales.js'
 import { botonPrimario, botonSecundario, tarjeta } from '../components/estilos.js'
 import { normalizar } from '../utils/formato.js'
+import Volver from '../components/Volver.jsx'
 
 const MAX_RESULTADOS = 8
-
-function Volver() {
-  return (
-    <Link to="/mis-locales" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-terracota hover:text-terracota-oscuro">
-      ← Mis locales
-    </Link>
-  )
-}
 
 function CambiarNombre({ bar, onGuardado }) {
   const { token } = useAuth()

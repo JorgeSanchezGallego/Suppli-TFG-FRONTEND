@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth.js'
 import { useEncargado } from '../hooks/useEncargado.js'
 import { crearBar } from '../api/bares.js'
@@ -10,6 +10,7 @@ import Campo from '../components/formulario/Campo.jsx'
 import SelectorFoto from '../components/encargado/SelectorFoto.jsx'
 import { botonPrimario, botonSecundario, tarjeta } from '../components/estilos.js'
 import { obligatorio, sinErrores, validarFoto } from '../utils/validaciones.js'
+import Volver from '../components/Volver.jsx'
 
 function NuevoLocal({ onCancelar }) {
   const { token } = useAuth()
@@ -102,9 +103,7 @@ export default function MisLocales() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 pt-28 pb-20">
-      <Link to="/panel" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-terracota hover:text-terracota-oscuro">
-        ← Volver al panel
-      </Link>
+      <Volver />
 
       <CabeceraOscura etiqueta="Gestión" titulo="Mis locales">
         <p className="mt-3 max-w-2xl text-crema/80 md:text-lg">
