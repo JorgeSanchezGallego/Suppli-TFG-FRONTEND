@@ -42,6 +42,11 @@ export default function Footer() {
               Quiénes somos
             </Link>
           </li>
+          <li>
+            <Link to="/politica-cookies" className="hover:text-crema">
+              Política de cookies
+            </Link>
+          </li>
         </ul>
       </div>
 

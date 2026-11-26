@@ -139,7 +139,10 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="block rounded-2xl px-4 py-3 font-medium text-cafe hover:bg-arena/40">
+                <Link
+                  to="/login"
+                  className="block rounded-full bg-terracota/10 py-3 text-center font-medium text-terracota-oscuro ring-1 ring-terracota/30 transition-colors hover:bg-terracota/20"
+                >
                   Iniciar sesión
                 </Link>
                 <Link

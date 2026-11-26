@@ -16,7 +16,7 @@ El objetivo es quitarle al encargado el papel de cuello de botella en las compra
 | Herramienta de desarrollo y build | Vite 8 |
 | Navegación | React Router 7 |
 | Estilos | Tailwind CSS 4 |
-| Tipografía | Outfit (Google Fonts) |
+| Tipografía | Outfit, servida desde `public/fonts` (sin peticiones a Google Fonts) |
 | Estado de la sesión | Context API de React |
 | Peticiones a la API | `fetch` nativo |
 | Calidad de código | Oxlint |
@@ -155,6 +155,7 @@ La lista completa está en el README del backend.
 |---|---|---|
 | `/` | Público | Landing: hero a pantalla completa con el logo, y las tarjetas de los tres locales con carrusel de fotos, descripción, web y cómo llegar |
 | `/quienes-somos` | Público | Origen del proyecto, el problema que resuelve, la solución y quién está detrás |
+| `/politica-cookies` | Público | Qué guarda Suppli en el navegador y para qué, servicios de terceros y opción de cambiar la elección del aviso de cookies |
 | `/login` | Público | Inicio de sesión. Si ya hay sesión, redirige a `/panel` |
 | `/register` | Público | Registro de una cuenta nueva. Al terminar, inicia sesión automáticamente |
 | `/panel` | Con sesión | Página de inicio de cada rol. **Empleado:** aviso si aún no tiene local, sus locales con foto y logo, y accesos al catálogo y a los pedidos. **Encargado:** resumen con el número de locales, empleados (lleva a la lista de empleados) y pedidos pendientes, aviso si hay empleados registrados esperando un local, sus locales con foto, y accesos a la gestión de locales, los pedidos y el catálogo |
@@ -170,6 +171,7 @@ La lista completa está en el README del backend.
 
 - **Paleta cálida y clara:** crema (`#fbf7f1`), arena (`#e8dfd3`), terracota (`#c2643c`) y café (`#2b211b`). Están definidos en `src/index.css` y se usan como clases de Tailwind (`bg-crema`, `text-terracota`, etc.).
 - **Tipografía:** Outfit.
+- **Aviso de cookies:** banner inferior con «Aceptar» y «Rechazar» hasta que el usuario elige. La elección se guarda en `localStorage` (`suppli-consentimiento`) y se puede cambiar desde `/politica-cookies`. Suppli solo usa almacenamiento técnico, así que ninguna de las dos opciones cambia el funcionamiento.
 - **Menú superior fijo:** es transparente sobre el hero y toma fondo al hacer scroll. Se esconde al bajar y vuelve a aparecer al subir. En móvil se convierte en un menú hamburguesa.
 - **Login y registro:** foto a pantalla completa con el formulario en una tarjeta.
 - **Diseño responsive**, probado en escritorio, tablet y móvil.

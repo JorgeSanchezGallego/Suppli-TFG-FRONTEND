@@ -8,6 +8,7 @@ import Inicio from './pages/Inicio.jsx'
 import Login from './pages/Login.jsx'
 import Registro from './pages/Registro.jsx'
 import QuienesSomos from './pages/QuienesSomos.jsx'
+import PoliticaCookies from './pages/PoliticaCookies.jsx'
 import Panel from './pages/Panel.jsx'
 import Catalogo from './pages/Catalogo.jsx'
 import CatalogoProveedor from './pages/CatalogoProveedor.jsx'
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Registro /> },
       { path: 'quienes-somos', element: <QuienesSomos /> },
+      { path: 'politica-cookies', element: <PoliticaCookies /> },
       {
         element: <RutaPrivada />,
         children: [
