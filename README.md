@@ -20,6 +20,7 @@ El objetivo es quitarle al encargado el papel de cuello de botella en las compra
 | Estado de la sesión | Context API de React |
 | Peticiones a la API | `fetch` nativo |
 | Calidad de código | Oxlint |
+| Pruebas unitarias | Vitest |
 
 El proyecto completo sigue la arquitectura **MERN** (MongoDB, Express, React, Node.js).
 
@@ -45,7 +46,7 @@ frontend-app/
 │   ├── data/                 # Datos de los locales que se muestran en la landing
 │   ├── hooks/                # Carga de datos del catálogo, del encargado y del proveedor
 │   ├── pages/                # Una página por ruta (ver la tabla de Páginas)
-│   ├── utils/                # Validaciones, formato de precios y fechas, mensaje de WhatsApp y consentimiento de cookies
+│   ├── utils/                # Validaciones, formato de precios y fechas, mensaje de WhatsApp y consentimiento de cookies, con sus pruebas (*.test.js)
 │   ├── App.jsx               # Definición de las rutas
 │   ├── index.css             # Tailwind, paleta de colores y tipografía
 │   └── main.jsx              # Punto de entrada
@@ -139,6 +140,25 @@ npm run preview
 ```bash
 npm run lint
 ```
+
+**Pruebas unitarias:**
+
+```bash
+npm test
+```
+
+### Pruebas
+
+Las pruebas usan **Vitest** y están junto al código que prueban, en `src/utils/*.test.js`. Se centran en las funciones de `utils/`, que contienen la lógica de la app sin depender de la pantalla ni de la API, así que no hace falta tener el backend arrancado para ejecutarlas. Las que dependen de la fecha o la hora (edad mínima, saludo del mensaje) fijan un día concreto para que el resultado sea siempre el mismo.
+
+| Archivo | Qué comprueba |
+|---|---|
+| `validaciones.test.js` | Campos obligatorios, formato del correo, reglas de la contraseña (8 caracteres, mayúscula y número) y que coincida al repetirla, teléfono español con o sin `+34`, edad mínima de 16 años y formato y tamaño de las fotos |
+| `formato.test.js` | Precios en euros, edad a partir de la fecha de nacimiento, temporada (verano o invierno), listas con «y», si hoy es día de reparto y plural de la medida («1 caja», «4 cajas», «3 unidades», «2 kg») |
+| `whatsapp.test.js` | Mensaje del pedido con el nombre del contacto, el local y los productos, saludo según la hora, prefijo 34 del teléfono y enlace `wa.me` con el mensaje codificado |
+| `pedidos.test.js` | Desde qué locales puede pedir cada rol: el empleado desde los suyos, el encargado desde los que gestiona y el proveedor desde ninguno |
+
+Resultado actual: **4 archivos y 51 pruebas superadas**.
 
 ### Usuarios de prueba
 
@@ -303,6 +323,7 @@ Los errores que devuelve la API, como "Usuario o contraseña incorrectos" o "El 
 - [x] **Gestión de proveedores** por parte del encargado: alta, edición, borrado y catálogo
 - [x] Borrado de pedidos según el rol
 - [x] **Política de cookies** con aviso, y tipografía servida desde la propia app
+- [x] **Pruebas unitarias** con Vitest de la lógica de `utils/`
 - [ ] Más adelante: gestión de propinas y solicitud de días libres para el personal
 
 ---
