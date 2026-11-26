@@ -4,7 +4,7 @@
 
 El objetivo es quitarle al encargado el papel de cuello de botella en las compras. Cualquier trabajador autorizado del local puede buscar los productos que necesita, ver a qué proveedor pertenecen y preparar el pedido, que se envía al proveedor por WhatsApp con el mensaje ya formateado.
 
-> **Estado actual: en desarrollo.** Este repositorio contiene el **frontend en React**. Ya están hechas la landing, la página "Quiénes somos", el login, el registro y la gestión de la sesión. Faltan el catálogo, el carrito y los pedidos (ver [Próximos pasos](#próximos-pasos)). La API REST está en su propio repositorio: [Suppli-TFG-BACKEND](https://github.com/JorgeSanchezGallego/Suppli-TFG-BACKEND).
+> **Estado actual:** este repositorio contiene el **frontend en React**, con todas las funciones principales terminadas: landing, login y registro, catálogo, pedido en curso, envío por WhatsApp, historial, paneles del empleado, del encargado y del proveedor, gestión de locales, de empleados y de proveedores, y política de cookies. La API REST está en su propio repositorio: [Suppli-TFG-BACKEND](https://github.com/JorgeSanchezGallego/Suppli-TFG-BACKEND).
 
 ---
 
@@ -30,16 +30,22 @@ El proyecto completo sigue la arquitectura **MERN** (MongoDB, Express, React, No
 ```
 frontend-app/
 ├── public/
-│   └── favicon.svg           # Icono de la pestaña
+│   ├── favicon.svg           # Icono de la pestaña
+│   └── fonts/                # Tipografía Outfit (woff2), servida desde la propia app
 ├── src/
-│   ├── api/                  # Cliente de la API (fetch) y llamadas de usuarios
+│   ├── api/                  # Cliente de la API (fetch) y llamadas por recurso: usuarios, bares, proveedores, productos y pedidos
 │   ├── assets/img/           # Fotos del hero, de los locales, del login y del registro
-│   ├── components/           # Menú, footer, hero, logo, carrusel, tarjetas y ruta privada
-│   │   └── formulario/       # Campos, campo de contraseña y diseño común de login y registro
-│   ├── context/              # Contexto de la sesión (AuthProvider y useAuth)
+│   ├── components/           # Menú, carrito, footer, hero, aviso de cookies, tarjetas y rutas protegidas por rol
+│   │   ├── catalogo/         # Tarjetas de proveedor y producto, buscador, selector de cantidad y barra del pedido
+│   │   ├── encargado/        # Panel del encargado, fichas de empleados, cambio de rol, fotos y encargados de un local
+│   │   ├── formulario/       # Campos, campo de contraseña y diseño común de login y registro
+│   │   ├── historial/        # Tarjeta de pedido y colores de cada estado
+│   │   └── proveedor/        # Panel del proveedor y formularios de producto y de proveedor
+│   ├── context/              # Contextos de la sesión (AuthProvider) y del pedido en curso (PedidoProvider)
 │   ├── data/                 # Datos de los locales que se muestran en la landing
-│   ├── pages/                # Páginas: Inicio, Quiénes somos, Login, Registro y Panel
-│   ├── utils/                # Validaciones de los formularios
+│   ├── hooks/                # Carga de datos del catálogo, del encargado y del proveedor
+│   ├── pages/                # Una página por ruta (ver la tabla de Páginas)
+│   ├── utils/                # Validaciones, formato de precios y fechas, mensaje de WhatsApp y consentimiento de cookies
 │   ├── App.jsx               # Definición de las rutas
 │   ├── index.css             # Tailwind, paleta de colores y tipografía
 │   └── main.jsx              # Punto de entrada
@@ -54,7 +60,7 @@ frontend-app/
 ## Requisitos previos
 
 - **Node.js** 20 o superior y **npm**
-- El **backend** de Suppli funcionando ([Suppli-TFG-BACKEND](https://github.com/JorgeSanchezGallego/Suppli-TFG-BACKEND)), con su base de datos y, para probar, los datos del seed cargados
+- El **backend** de Suppli funcionando ([Suppli-TFG-BACKEND](https://github.com/JorgeSanchezGallego/Suppli-TFG-BACKEND)), con su base de datos y los datos del seed cargados (su README explica cuándo hace falta ejecutar `npm run seed`)
 
 ---
 
@@ -136,16 +142,17 @@ npm run lint
 
 ### Usuarios de prueba
 
-Si el backend tiene cargado el seed (`npm run seed` en el backend), se puede entrar con cualquiera de sus usuarios, todos con la contraseña `Prueba1234`. Por ejemplo:
+Si el backend tiene cargado el seed, se puede entrar con cualquiera de sus usuarios, todos con la contraseña `Prueba1234`. Por ejemplo:
 
 | Correo | Rol |
 |---|---|
 | `empleado1@suppli.test` | Empleado de *Kiosko Gómiz* y *Noray* |
 | `empleado4@suppli.test` | Empleado sin bar asignado |
 | `encargado1@suppli.test` | Encargado de *Kiosko Gómiz* y *Noray* |
-| `proveedor1@suppli.test` | Proveedor de *Bebidas del Sur* |
+| `proveedor1@suppli.test` | Proveedor de *Cafés Tavira* |
+| `proveedor2@suppli.test` | Proveedor de *Exclusivas Ramírez* |
 
-La lista completa está en el README del backend.
+El seed trae **4 proveedores reales** (Cafés Tavira, Exclusivas Ramírez, Comercial Tabarca y Distribuciones Guillén) con 34 productos y sus fotos, y **ningún pedido**: el historial empieza vacío. La lista completa de usuarios está en el README del backend.
 
 ---
 
@@ -158,14 +165,18 @@ La lista completa está en el README del backend.
 | `/politica-cookies` | Público | Qué guarda Suppli en el navegador y para qué, servicios de terceros y opción de cambiar la elección del aviso de cookies |
 | `/login` | Público | Inicio de sesión. Si ya hay sesión, redirige a `/panel` |
 | `/register` | Público | Registro de una cuenta nueva. Al terminar, inicia sesión automáticamente |
-| `/panel` | Con sesión | Página de inicio de cada rol. **Empleado:** aviso si aún no tiene local, sus locales con foto y logo, y accesos al catálogo y a los pedidos. **Encargado:** resumen con el número de locales, empleados (lleva a la lista de empleados) y pedidos pendientes, aviso si hay empleados registrados esperando un local, sus locales con foto, y accesos a la gestión de locales, los pedidos y el catálogo |
+| `/panel` | Con sesión | Página de inicio de cada rol. **Empleado:** aviso si aún no tiene local, sus locales con foto y logo, y accesos al catálogo y a los pedidos. **Encargado:** resumen con el número de locales, empleados (lleva a la lista de empleados) y pedidos pendientes, aviso si hay empleados registrados esperando un local, sus locales con foto, y accesos a la gestión de locales, los pedidos y el catálogo. **Proveedor:** cifras de su empresa (productos, pedidos pendientes, importe pedido este mes y locales clientes), aviso destacado los días de reparto y los pedidos que tiene por entregar |
 | `/mis-locales` | Encargado | Lista de los locales del encargado, con sus empleados y pedidos pendientes, y formulario para crear uno nuevo (nombre, dirección y foto opcional con vista previa; la dirección no se puede cambiar después). Los locales sin foto muestran su nombre sobre un fondo terracota |
 | `/mis-locales/:id` | Encargado | Gestión de un local: ver, añadir y quitar a sus encargados (o dejar de gestionarlo uno mismo), cambiar el nombre, añadir o cambiar la foto (se usa como fondo de la cabecera), ver y quitar empleados, buscar entre todos los empleados (por nombre, apellidos o correo) para añadirlos, y borrar el local con una confirmación en la que hay que escribir su nombre |
 | `/empleados` | Encargado | Todo el equipo (empleados y encargados; los proveedores tienen su propio filtro), en fichas con su nombre, los locales en los que trabajan, correo, teléfono, residencia, edad y fecha de alta. Filtros "Todos", "En mis locales", "Sin local", "Encargados" y "Proveedores", buscador por nombre, correo, teléfono o residencia, un selector para añadir a cada empleado a uno de tus locales (o, si es encargado, añadirlo como encargado de uno de tus locales) y la opción **Cambiar rol** en cada ficha (empleado, encargado o proveedor con su empresa), que explica qué implica cada cambio antes de guardarlo |
-| `/catalogo` | Con sesión | Vista general de todos los proveedores: contacto, días de reparto, número de productos y categorías. Tiene un buscador que encuentra proveedores y también productos (indicando a qué proveedor se piden) |
-| `/pedido` | Con sesión (empleado con local) | Revisión del pedido en curso: productos con su cantidad e importe, total, elección del local desde el que se pide, vista previa del mensaje y botón **Enviar por WhatsApp**, que guarda el pedido en la API y abre WhatsApp con el mensaje listo para el proveedor |
-| `/historial` | Con sesión | Historial de pedidos según el rol: el empleado ve los de sus locales (suyos y de sus compañeros), el encargado los de todos sus locales y el proveedor los que ha recibido su empresa. Cada pedido es una tarjeta con proveedor (o local), fecha, quién lo hizo, estado y total, que se despliega para ver los productos. Filtros por estado y por local, se muestran 20 pedidos y un botón "Ver más" carga los siguientes, y botón para marcar como entregado los pedidos pendientes (encargado y empleados del local) |
-| `/catalogo/:proveedorId` | Con sesión | Productos de un proveedor, con buscador y filtro por categoría. Cada producto muestra su precio, proveedor y categoría, un icono de información que, al pasar el ratón, enseña el stock óptimo de invierno y verano y los días de reparto, y un selector de cantidad en su medida (lata, kg, barril…) |
+| `/catalogo` | Empleado / Encargado | Vista general de todos los proveedores: contacto, días de reparto, número de productos y categorías. Tiene un buscador que encuentra proveedores y también productos (indicando a qué proveedor se piden). El encargado tiene además el botón **Nuevo proveedor** |
+| `/catalogo/:proveedorId` | Con sesión | Productos de un proveedor, con buscador y filtro por categoría. Cada producto muestra su precio, proveedor y categoría, un icono de información que, al pasar el ratón, enseña el stock óptimo de invierno y verano y los días de reparto, y un selector de cantidad en su medida (caja, unidad…). El encargado ve el botón **Gestionar catálogo**. Un proveedor solo puede abrir el de su propia empresa |
+| `/catalogo/:proveedorId/gestionar` | Encargado | Gestión del catálogo de cualquier proveedor: crear, editar y borrar productos (con foto), editar los datos del proveedor y borrarlo, con una confirmación en la que hay que escribir su nombre (se borran también sus productos y sus pedidos) |
+| `/proveedores/nuevo` | Encargado | Alta de un proveedor: empresa, persona de contacto, teléfono y días de reparto. Al guardarlo se abre la gestión de su catálogo para añadirle productos |
+| `/pedido` | Empleado con local / Encargado | Revisión del pedido en curso: productos con su cantidad e importe, total, elección del local desde el que se pide, vista previa del mensaje y botón **Enviar por WhatsApp**, que guarda el pedido en la API y abre WhatsApp con el mensaje listo para el proveedor |
+| `/historial` | Con sesión | Historial de pedidos según el rol: el empleado ve los de sus locales (suyos y de sus compañeros), el encargado los de todos sus locales y el proveedor, con el título "Pedidos recibidos", los que ha recibido su empresa. Cada pedido es una tarjeta con proveedor (o local), fecha, quién lo hizo, estado y total, que se despliega para ver los productos. Filtros por estado y por local, se muestran 20 pedidos y un botón "Ver más" carga los siguientes. Desde cada tarjeta se puede marcar como entregado y borrar el pedido (ver [Estados del pedido](#estados-del-pedido)) |
+| `/mi-catalogo` | Proveedor | Catálogo de su empresa: crear, editar y borrar sus productos (nombre, precio, medida, categoría, stock óptimo de invierno y verano, y foto) en un formulario en ventana emergente |
+| `/mi-empresa` | Proveedor | Datos de su empresa: nombre, persona de contacto, teléfono y días de reparto |
 
 ### Diseño
 
@@ -185,7 +196,8 @@ La lista completa está en el README del backend.
 - Al cargar la página, y cada vez que se vuelve a la pestaña, el frontend pide los datos actualizados del usuario a `GET /api/usuarios/yo`. Así, si un encargado añade al empleado a un bar, el empleado lo ve sin tener que volver a iniciar sesión.
 - La sesión se cierra sola cuando caduca el token o cuando la API responde `401`.
 - El componente `RutaPrivada` protege las páginas que necesitan sesión. Si no hay sesión, lleva al login y, al entrar, devuelve a la página que se intentaba abrir.
-- Con la sesión iniciada, el menú muestra un único enlace, **Panel**, además del nombre del usuario, el carrito (para empleados con local) y el botón **Cerrar sesión**. El resto de secciones (catálogo, pedidos…) se abren desde el panel, para que el menú no crezca con cada página nueva.
+- Además, cada rol tiene su propia protección: `RutaEncargado` deja pasar solo a encargados, `RutaProveedor` solo a proveedores con empresa, y `RutaNoProveedor` impide que un proveedor entre al catálogo general o al pedido (lo lleva a su catálogo). Un proveedor no puede ver a los demás proveedores, igual que en la API.
+- Con la sesión iniciada, el menú muestra un único enlace, **Panel**, además del nombre del usuario, el carrito (para quien puede hacer pedidos: empleados con local y encargados) y el botón **Cerrar sesión**. El resto de secciones (catálogo, pedidos…) se abren desde el panel, para que el menú no crezca con cada página nueva.
 
 > **Sobre el registro:** todo el que se registra entra como `empleado` y sin bar asignado. Puede iniciar sesión, pero no puede hacer pedidos hasta que el encargado de un bar lo añada a su local. Es una decisión de seguridad: así nadie de fuera puede hacer pedidos en nombre de un local.
 
@@ -218,21 +230,43 @@ Desde **Revisar pedido** se llega a `/pedido`. Al pulsar **Enviar por WhatsApp**
 Ejemplo de mensaje:
 
 ```
-Hola Luis, buenas tardes.
+Hola Manolo, buenas tardes.
 Te escribo desde Noray para hacerte el siguiente pedido:
 
-- Aceitunas aliñadas: 1 kg
-- Limones: 2 kg
-- Patatas fritas: 1 bolsa 1kg
+- Corona 330ml (caja 24): 4 cajas
+- Patatas Supreme 45g (caja 24): 2 cajas
+- Cóctel frutos secos R55 1kg: 1 unidad
 ```
 
 El saludo usa el nombre de la persona de contacto del proveedor y cambia según la hora (buenos días, buenas tardes o buenas noches).
 
-Solo los **empleados con un local asignado** pueden preparar pedidos. Los demás usuarios pueden consultar el catálogo.
+Pueden preparar pedidos los **empleados con un local asignado**, para los locales en los que trabajan, y los **encargados**, para los locales que gestionan. Un empleado sin local puede consultar el catálogo, pero no pedir. Los proveedores no tienen acceso al catálogo general ni al pedido.
 
 ### Estados del pedido
 
 Todo pedido se crea como **pendiente** y solo puede pasar a **entregado** cuando llega la mercancía. En el historial, cada pedido muestra su estado con un color (pendiente en ámbar y entregado en verde). Al desplegar un pedido pendiente aparece el botón **Marcar como entregado**, que solo ven el encargado y los empleados del local, igual que exige la API. Un pedido entregado ya no se puede modificar.
+
+**Borrar un pedido.** El botón **Borrar pedido** pide confirmación antes de borrarlo, porque no se puede deshacer. El encargado puede borrar cualquier pedido de sus locales. El empleado solo puede borrar los que ha hecho él y mientras sigan pendientes. El proveedor no puede borrar pedidos.
+
+### Panel del proveedor
+
+Un usuario con rol **proveedor** entra a un panel propio, pensado para su empresa y no para un bar:
+
+- **Resumen:** número de productos, pedidos pendientes, importe pedido este mes y número de locales que le compran. Los días de reparto aparecen destacados, y si aún no los ha indicado, un aviso le lleva a rellenarlos.
+- **Mi catálogo** (`/mi-catalogo`): alta, edición y borrado de sus productos con foto.
+- **Pedidos recibidos** (`/historial`): los pedidos que los bares han hecho a su empresa.
+- **Datos de la empresa** (`/mi-empresa`): contacto, teléfono y días de reparto, que son los que ven los bares en el catálogo.
+
+Si su cuenta todavía no está vinculada a ninguna empresa, el panel le pide que se lo solicite a un encargado.
+
+### Gestión de proveedores (encargado)
+
+Los proveedores son comunes a todos los locales. El encargado puede:
+
+- **Dar de alta** un proveedor desde el botón **Nuevo proveedor** del catálogo.
+- **Gestionar el catálogo** de cualquier proveedor, aunque el proveedor no tenga cuenta en Suppli: crear, editar y borrar productos.
+- **Editar los datos** del proveedor o **borrarlo**. Al borrarlo se pierden sus productos y todos sus pedidos, en todos los locales, así que la app pide escribir el nombre de la empresa para confirmarlo.
+- **Vincular a un usuario** con un proveedor cambiándole el rol a *proveedor* desde la página de empleados.
 
 ### Validaciones de los formularios
 
@@ -265,8 +299,11 @@ Los errores que devuelve la API, como "Usuario o contraseña incorrectos" o "El 
 - [x] Envío del pedido al proveedor por **WhatsApp**, con el mensaje ya formateado
 - [x] **Historial de pedidos** y cambio de estado (`pendiente` → `entregado`)
 - [x] Panel del **encargado**: resumen, gestión de locales y de sus empleados
-- [ ] Panel del **proveedor**: gestión de su catálogo
-- [ ] Gestión de proveedores
+- [x] Panel del **proveedor**: resumen, gestión de su catálogo y de los datos de su empresa
+- [x] **Gestión de proveedores** por parte del encargado: alta, edición, borrado y catálogo
+- [x] Borrado de pedidos según el rol
+- [x] **Política de cookies** con aviso, y tipografía servida desde la propia app
+- [ ] Más adelante: gestión de propinas y solicitud de días libres para el personal
 
 ---
 
